@@ -16,6 +16,12 @@ def extract_tickers():
 
     return tickers_codes
 
-tickers = extract_tickers()
-df = pd.DataFrame(tickers)
-df.to_csv('tickers.csv')
+def save_tickers_to_csv(tickers):
+    df = pd.DataFrame(tickers, columns=['Ticker'])
+    df.to_csv('tickers.csv', index=False)
+
+
+if __name__ == "__main__":
+    tickers = extract_tickers()
+    save_tickers_to_csv(tickers)
+    print("Tickers have been saved to tickers.csv")
