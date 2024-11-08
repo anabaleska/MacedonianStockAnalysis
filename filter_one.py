@@ -1,6 +1,5 @@
 import requests
 from bs4 import BeautifulSoup
-import os
 import pandas as pd
 
 def extract_tickers():
@@ -19,6 +18,7 @@ def extract_tickers():
 def save_tickers_to_csv(tickers):
     df = pd.DataFrame(tickers, columns=['Ticker'])
     df.to_csv('tickers.csv', index=False)
+    df.to_csv('tickers.csv', mode='w', header=True, index=False, chunksize=1000)
 
 
 if __name__ == "__main__":
