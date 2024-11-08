@@ -84,7 +84,8 @@ def process_tickers(tickers):
         # Check the last available date for each ticker
         last_date = check_last_available_date( df_existing)
         print(f"Proccessing for ticker {ticker}")
-
+        if last_date.date()== datetime.now().date()-timedelta(days=1):
+            continue
         if last_date is None:
             # No data for this ticker, fetch data for the last 10 years
             start_date = (datetime.now() - pd.DateOffset(years=10)).strftime('%Y-%m-%d')
