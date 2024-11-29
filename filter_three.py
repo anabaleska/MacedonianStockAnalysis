@@ -1,21 +1,26 @@
 import os
 import pandas as pd
 from datetime import datetime, timedelta
+from sqlalchemy import Table, Column, String, Date, Float, MetaData, Integer
+from db_config import get_database_connection
+from sqlalchemy.dialects.postgresql import insert
 
 from dateutil.relativedelta import relativedelta
-from sympy.physics.units import years
-
 from filter_one import extract_tickers
-from filter_two import load_existing_data, check_last_available_date
+from filter_two import check_last_available_date
 from concurrent.futures import ThreadPoolExecutor
 import requests
 from bs4 import BeautifulSoup
 
-
-# def format_data(data):
-#     # Ensure dates are in a consistent format
-#     data['Date'] = pd.to_datetime(data['Date'], errors='coerce').dt.strftime('%Y-%m-%d')
-#     return data
+def format_number(value):
+    if value is None or value == "":
+        return None
+    value = value.replace(',', '.')
+    if '.' in value:
+        parts = value.split('.')
+        if len(parts) > 2:
+            value = value.replace('.', '', value.count('.') - 1)
+    return value
 
 def fetch_data_for_ticker(ticker, start_date):
     print(f"Fetching data for {ticker} starting from {start_date}")
@@ -41,29 +46,62 @@ def fetch_data_for_ticker(ticker, start_date):
                 rows = table.find_all('tr')
                 for row in rows:
                     data_row = [cell.text.strip() for cell in row.find_all('td')]
-                    data_rows.append(data_row)
+                    data_dict = {
+                        "Date": data_row[0],
+                        "LastTransaction": format_number(data_row[1]),
+                        "Max": format_number(data_row[2]),
+                        "Min": format_number(data_row[3]),
+                        "Avg": format_number(data_row[4]),
+                        "Prom": format_number(data_row[5]),
+                        "Amount": format_number(data_row[6]),
+                        "BEST": format_number(data_row[7]),
+                        "Total": format_number(data_row[8])
+                    }
+                    data_rows.append(data_dict)
 
             date_to = date_from - timedelta(days=1)
 
     return data_rows
 
 
-def update_data(df_existing, new_data):
-    # Combine the new data with existing data
-    df_combined = pd.concat([pd.DataFrame(new_data,columns=["Date", "LastTransaction", "Max", "Min", "Avg", "%Prom", "Amount", "BEST", "Total"]), df_existing], ignore_index=True)
+def update_data(ticker, dictionary):
+    engine = get_database_connection()
+    metadata = MetaData()
+    ticker_table = Table(ticker, metadata, autoload_with=engine)
 
-    # Ensure no duplicate entries (based on 'Ticker' and 'Date')
-    df_combined = df_combined.drop_duplicates(subset=['Date'], keep='last')
+    with engine.connect() as conn:
+        with conn.begin():
+            for row in dictionary:
+                insert_stmt = insert(ticker_table).values(
+                    date=row['Date'],
+                    last_transaction=float(row['LastTransaction']) if row['LastTransaction'] else None,
+                    max=float(row['Max'])  if row['Max'] else None,
+                    min=float(row['Min'])  if row['Min'] else None,
+                    avg=float(row['Avg'])  if row['Avg'] else None,
+                    prom = float(row['Prom']) if row['Prom'] else None,
+                amount = int(row['Amount']) if row['Amount'] else None,
+                best = float(row['BEST']) if row['BEST'] else None,
+                total = float(row['Total']) if row['Total'] else None
+                )
+                try:
+                    conn.execute(insert_stmt)
 
-    return df_combined.dropna(axis=1, how='all')
+                except Exception as e:
+                    print(f"Error saving ticker {ticker}: {str(e)}")
+        print(f"Saving ticker: {ticker}")
+
+
+
+
+
 
 def process_single_ticker(ticker):
     print(f"Processing ticker: {ticker}")
-    df_existing = load_existing_data(ticker)
-    last_date = check_last_available_date(df_existing)
+
+    last_date = check_last_available_date(ticker)
 
     if last_date is None:
-        # No data for this ticker, fetch data for the last 10 years
+
         last_date = datetime.today() - relativedelta(years=10)
     today=datetime.now().date() - timedelta(days=1)
     if datetime.today().weekday()==6:
@@ -76,14 +114,11 @@ def process_single_ticker(ticker):
         return
     last_date = last_date.date()
     new_data = fetch_data_for_ticker(ticker, last_date)
-    df_existing = update_data(df_existing, new_data)
-    df_existing.to_csv(f'DataFrames/{ticker}.csv', index=False)
+    update_data(ticker, new_data)
+    # df_existing.to_csv(f'DataFrames/{ticker}.csv', index=False)
     print(f"Done for ticker {ticker}")
 
 def process_tickers(tickers):
-    # Create the directory if it doesn't exist
-    if not os.path.exists('DataFrames'):
-        os.makedirs('DataFrames')
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         executor.map(process_single_ticker, tickers)
