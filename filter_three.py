@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import Table, Column, String, Date, Float, MetaData, Integer
 from db_config import get_database_connection
 from sqlalchemy.dialects.postgresql import insert
+from functools import partial
+from sqlalchemy import text
 
 from dateutil.relativedelta import relativedelta
 from filter_one import extract_tickers
@@ -67,61 +69,63 @@ def fetch_data_for_ticker(ticker, start_date):
 def update_data(ticker, dictionary):
     engine = get_database_connection()
     metadata = MetaData()
-    ticker_table = Table(ticker, metadata, autoload_with=engine)
+    ticker_table = Table('ticker_data', metadata, autoload_with=engine)
+    with engine.connect() as conn:
+        conn = conn.execution_options(autocommit=True)
+        ticker_id_query = text('SELECT id FROM tickers WHERE ticker = :ticker')
+        result = conn.execute(ticker_id_query, {'ticker': ticker})
+        ticker_id = result.scalar()
 
     with engine.connect() as conn:
         with conn.begin():
             for row in dictionary:
-                insert_stmt = insert(ticker_table).values(
-                    date=row['Date'],
-                    last_transaction=float(row['LastTransaction']) if row['LastTransaction'] else None,
-                    max=float(row['Max'])  if row['Max'] else None,
-                    min=float(row['Min'])  if row['Min'] else None,
-                    avg=float(row['Avg'])  if row['Avg'] else None,
-                    prom = float(row['Prom']) if row['Prom'] else None,
-                amount = int(row['Amount']) if row['Amount'] else None,
-                best = float(row['BEST']) if row['BEST'] else None,
-                total = float(row['Total']) if row['Total'] else None
-                )
-                try:
-                    conn.execute(insert_stmt)
+                        insert_stmt = insert(ticker_table).values(
+                            id=ticker_id,
+                            date=row['Date'],
+                            last_transaction=float(row['LastTransaction']) if row['LastTransaction'] else None,
+                            max=float(row['Max'])  if row['Max'] else None,
+                            min=float(row['Min'])  if row['Min'] else None,
+                            avg=float(row['Avg'])  if row['Avg'] else None,
+                            prom = float(row['Prom']) if row['Prom'] else None,
+                        amount = int(float(row['Amount'])) if row['Amount'] else None,
+                        best = float(row['BEST']) if row['BEST'] else None,
+                        total = float(row['Total']) if row['Total'] else None
+                        )
+                        #insert_stmt = insert_stmt.on_conflict_do_nothing(index_elements=['Date','id'])
+                        try:
 
-                except Exception as e:
-                    print(f"Error saving ticker {ticker}: {str(e)}")
+                            conn.execute(insert_stmt)
+
+                        except Exception as e:
+                            print(f"Error saving ticker {ticker}: {str(e)}")
         print(f"Saving ticker: {ticker}")
 
-
-
-
-
-
-def process_single_ticker(ticker):
+def process_single_ticker(ticker,last_date):
     print(f"Processing ticker: {ticker}")
 
-    last_date = check_last_available_date(ticker)
 
-    if last_date is None:
-
-        last_date = datetime.today() - relativedelta(years=10)
-    today=datetime.now().date() - timedelta(days=1)
-    if datetime.today().weekday()==6:
-        today=today-timedelta(days=1)
-
-
-
-    if last_date.date() == today:
-        print(f"Data already up to date for {ticker}, skipping.")
-        return
-    last_date = last_date.date()
     new_data = fetch_data_for_ticker(ticker, last_date)
     update_data(ticker, new_data)
     # df_existing.to_csv(f'DataFrames/{ticker}.csv', index=False)
     print(f"Done for ticker {ticker}")
 
 def process_tickers(tickers):
+    last_date = check_last_available_date()
+
+    if last_date is None:
+        last_date = datetime.today() - relativedelta(years=10)
+    today = datetime.now().date() - timedelta(days=1)
+    if datetime.today().weekday() == 6:
+        today = today - timedelta(days=1)
+
+    if last_date.date() == today:
+        print(f"Data already up to date for , skipping.")
+        return
+    last_date = last_date.date()
+    process_with_date = partial(process_single_ticker, last_date=last_date)
 
     with ThreadPoolExecutor(max_workers=10) as executor:
-        executor.map(process_single_ticker, tickers)
+        executor.map(process_with_date, tickers)
 
 
 

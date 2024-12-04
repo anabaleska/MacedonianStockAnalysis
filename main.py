@@ -1,5 +1,5 @@
 import time
-from filter_one import extract_tickers, save_tickers_to_db, create_tables_for_all_tickers
+from filter_one import extract_tickers, save_tickers_to_db,create_ticker_table
 from filter_three import process_tickers
 
 def run_pipeline():
@@ -8,7 +8,9 @@ def run_pipeline():
     # Run Filter 1: Extract and save tickers
     tickers = extract_tickers()
     save_tickers_to_db(tickers)
-    create_tables_for_all_tickers()
+    create_ticker_table()
+
+    # create_tables_for_all_tickers()
 
 
     # Run Filter 2: Process tickers and update the historical data

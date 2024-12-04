@@ -3,10 +3,10 @@ from sqlalchemy import Table, Column, String, Date, Float, MetaData, Integer
 from db_config import get_database_connection
 from datetime import datetime
 
-def check_last_available_date(ticker):
+def check_last_available_date():
     engine = get_database_connection()
     metadata = MetaData()
-    ticker_table = Table(ticker, metadata, autoload_with=engine)
+    ticker_table = Table('ticker_data', metadata, autoload_with=engine)
 
 
     with engine.connect() as conn:
