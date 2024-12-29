@@ -1,0 +1,118 @@
+/* General Styles for the TickerList */
+.ticker-list {
+    align-items: flex-end;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+}
+
+.tickerList {
+    margin: 20px;
+    padding: 20px;
+    width: 300px; /* Set the width of the ticker list container */
+     /* Optional: Centers the ticker list */
+}
+
+/* Header Styles */
+.ticker-list h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Error Message Styles */
+.error {
+    color: red;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+/* Table Styles */
+.ticker-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.ticker-list th, .ticker-list td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.ticker-list th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.ticker-list td {
+    background-color: #ffffff;
+}
+
+/* Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.pagination button {
+    padding: 10px 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+/* Items Per Page Dropdown Styles */
+.ticker-list select {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+}
+
+.ticker-list label {
+    font-size: 14px;
+    margin-right: 10px;
+    color: #333;
+}
+
+/* Loading Styles */
+.ticker-list p {
+    font-size: 16px;
+    color: #555;
+}
+
+.sentiment{
+    border-radius: 8px;
+    background-color: rgba(0, 203, 106, 0.8);
+    display: flex;
+    margin-top: 4px;
+    align-items: center;
+    gap: 2px;
+    font-size: 10px;
+    color: var(--Color-White, #fff);
+    text-align: center;
+    justify-content: start;
+    padding: 4px;
+}
+/* Table Row Hover Effect */
+.ticker-list tbody tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}

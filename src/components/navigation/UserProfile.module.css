@@ -1,0 +1,51 @@
+:root {
+    --Text-Black: #152c07;
+    --Text-Gray2: #bebebe;
+}
+
+.container {
+    display: flex;
+    min-width: 240px;
+    align-items: start;
+    gap: 12px;
+    justify-content: start;
+    width: 321px;
+    margin: auto 0;
+}
+
+.avatar {
+    aspect-ratio: 1;
+    object-fit: contain;
+    object-position: center;
+    width: 40px;
+    border-radius: 50%;
+}
+
+.greeting {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+}
+
+.hello {
+    color: var(--Text-Gray2, #bebebe);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.name {
+    color: var(--Text-Black, #152c07);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+@media (max-width: 991px) {
+    .container {
+        white-space: initial;
+    }
+
+    .greeting {
+        white-space: initial;
+    }
+}

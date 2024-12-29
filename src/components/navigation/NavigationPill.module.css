@@ -1,0 +1,16 @@
+.pill {
+    align-self: stretch;
+    border-radius: 8px;
+    gap: 8px;
+    padding: 8px;
+    text-decoration: none;
+}
+
+.active {
+    background-color: rgba(245, 245, 245, 1);
+    color: #5ede99;
+}
+
+.default {
+    color: #000;
+}

@@ -1,0 +1,59 @@
+.container {
+    border-radius: 0;
+    display: flex;
+    max-width: 467px;
+    flex-direction: column;
+}
+
+.title {
+    color: rgba(32, 34, 36, 1);
+    letter-spacing: -0.11px;
+    align-self: start;
+    font: 700 32px Nunito Sans, -apple-system, Roboto, Helvetica, sans-serif;
+}
+
+.inputContainer {
+    display: flex;
+    margin-top: 32px;
+    width: 100%;
+    gap: 20px;
+    color: var(--Text-Gray2, #bebebe);
+    justify-content: space-between;
+    font: 400 14px Mulish, sans-serif;
+}
+
+.input {
+    align-self: stretch;
+    flex: 1;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 1);
+    box-shadow: 0px 2px 10px rgba(25, 42, 62, 0.08);
+    min-height: 47px;
+    padding: 15px 16px;
+    border: 1px solid rgba(233, 252, 233, 1);
+}
+
+.dateContainer {
+    display: flex;
+    gap: 12px;
+    white-space: nowrap;
+}
+
+.calendarIcon {
+    aspect-ratio: 1;
+    object-fit: contain;
+    object-position: center;
+    width: 26px;
+    margin: auto 0;
+}
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}

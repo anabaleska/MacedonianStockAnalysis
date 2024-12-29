@@ -1,0 +1,84 @@
+.transactionRow {
+    display: flex;
+    flex-direction: column;
+    font-family: Nunito Sans, sans-serif;
+}
+
+.transactionContent {
+    align-self: center;
+    display: flex;
+    width: 100%;
+    max-width: 1081px;
+    gap: 40px 81px;
+    flex-wrap: wrap;
+}
+
+.transactionDetails {
+    display: flex;
+    gap: 40px 100px;
+    font-size: 14px;
+    color: rgba(32, 34, 36, 1);
+    font-weight: 600;
+    white-space: nowrap;
+    flex-grow: 1;
+    flex-basis: auto;
+    margin: auto 0;
+}
+
+.transactionCode,
+.transactionAmount,
+.transactionBalance,
+.transactionDate,
+.transactionTotal {
+    background-blend-mode: normal;
+}
+
+.actionButtons {
+    display: flex;
+    gap: 27px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.deleteButton {
+    border-radius: 5px;
+    background-color: rgba(0, 182, 155, 1);
+    color: rgba(0, 182, 155, 1);
+    padding: 6px 10px;
+}
+
+.editButton {
+    border-radius: 5px;
+    background-color: rgba(124, 68, 255, 1);
+    color: rgba(98, 38, 239, 1);
+    padding: 6px 10px;
+}
+
+.divider {
+    aspect-ratio: 1000;
+    object-fit: contain;
+    object-position: center;
+    width: 100%;
+    background-blend-mode: normal;
+    margin-top: 24px;
+}
+
+@media (max-width: 991px) {
+    .transactionContent {
+        max-width: 100%;
+    }
+
+    .transactionDetails {
+        max-width: 100%;
+        white-space: initial;
+    }
+
+    .deleteButton,
+    .editButton {
+        white-space: initial;
+    }
+
+    .divider {
+        max-width: 100%;
+    }
+}
